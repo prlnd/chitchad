@@ -1,0 +1,3 @@
+﻿  ClientThread.cpp
+D:\Uni\31\Halozat\chitchad\ChitChad-Server\ChitChad-Server\ClientThread.cpp(131,25): warning C4267: 'initializing': conversion from 'size_t' to 'char', possible loss of data
+  ChitChad-Server.vcxproj -> D:\Uni\31\Halozat\chitchad\ChitChad-Server\Debug\ChitChad-Server.exe
