@@ -12,11 +12,13 @@ public:
     ~ChatClient();
     int getUsers();
     int sendUsername(std::string_view username);
-    int sendMessage(std::string_view message/*, std::string_view username*/);
-    int sendFile(std::string_view filename, std::string_view username);
+    int sendMessage(std::string_view message);
+    int sendFile(std::string_view path);
     SOCKET ClientSocket;
 
 private:
+    std::string_view getFilename(std::string_view path);
+
     enum DataProtocol {
         UserList,
         Message,

@@ -15,7 +15,9 @@ public slots:
     virtual void run() override;
 
 signals:
-    void getMessage(std::string_view username, std::string_view data);
+    void getUserList(std::string_view users);
+    void getMessage(std::string_view username, std::string_view message);
+    void getFile(std::string_view username, std::string_view filename, std::string_view content);
 
 private:
     enum DataProtocol {

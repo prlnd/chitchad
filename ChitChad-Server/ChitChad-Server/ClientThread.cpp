@@ -46,8 +46,10 @@ void ClientThread::run(void)
 			return;
 		}
 		std::string_view sv(recvBuf, iResult);
+		char type = recvBuf[DataOffset::Length];
 		std::cerr << "Received data: " << sv << ' ' << iResult << '\n';
-		switch (recvBuf[DataOffset::Length]) {
+		std::cerr << "Type " << (int)type << '\n';
+		switch(type) {
 		//case ClientDataProtocol::UserList:
 		//	sendBuf = getUsers();
 		//	if (send(m_socket, sendBuf.data(), sendBuf.length(), 0) == SOCKET_ERROR) {
@@ -64,10 +66,11 @@ void ClientThread::run(void)
 			//	std::cerr << "User " << id << " not found\n";
 			//	return;
 			//}
+			std::cerr << "Message\n";
 			const char* message = recvBuf + DataOffset::Length + DataOffset::Type;
 			std::ostringstream oss;
 			uint32_t msgLen = iResult - (message - recvBuf);
-			uint32_t size = DataOffset::Length + DataOffset::Type + 1 + message[0] + msgLen;
+			uint32_t size = DataOffset::Length + DataOffset::Type + 1 + m_identifier.size() + msgLen;
 			(oss.write(reinterpret_cast<const char*>(&size), sizeof(size))
 				<< static_cast<char>(ServerDataProtocol::Message)
 				<< static_cast<char>(m_identifier.size())
@@ -86,30 +89,31 @@ void ClientThread::run(void)
 			LeaveCriticalSection(&m_criticalSection);
 			break;
 		}
-		//case ClientDataProtocol::File: {
-		//	const char* name = recvBuf + DataOffset::Length + DataOffset::Type;
-		//	const char* message = name + name[0] + 1;
-		//	std::string_view id(name + 1, name[0]);
-		//	auto it = std::find_if(m_threads.begin(), m_threads.end(), [id](ClientThread& t) {return t.m_identifier == id; });
-		//	if (it == m_threads.end()) {
-		//		std::cerr << "User " << id << " not found\n";
-		//		return;
-		//	}
-		//	sendBuf.assign(4, '\0');
-		//	sendBuf += static_cast<char>(ServerDataProtocol::Message);
-		//	sendBuf += static_cast<char>(m_identifier.size());
-		//	sendBuf += m_identifier;
-		//	sendBuf.append(message, iResult - (message - recvBuf));
-		//	uint32_t size = sendBuf.size();
-		//	sendBuf.replace(0, DataOffset::Length, reinterpret_cast<const char*>(size), DataOffset::Length);
-		//	if (send(it->m_socket, sendBuf.data(), sendBuf.length(), 0) == SOCKET_ERROR) {
-		//		std::cerr << "Send failed: " << WSAGetLastError() << '\n';
-		//		return;
-		//	}
-		//	break;
-		//}
+		case ClientDataProtocol::File: {
+			const char* message = recvBuf + DataOffset::Length + DataOffset::Type;
+			std::ostringstream oss;
+			uint32_t msgLen = iResult - (message - recvBuf);
+			uint32_t size = DataOffset::Length + DataOffset::Type + 1 + m_identifier.size() + msgLen;
+			(oss.write(reinterpret_cast<const char*>(&size), sizeof(size))
+				<< static_cast<char>(ServerDataProtocol::File)
+				<< static_cast<char>(m_identifier.size())
+				<< m_identifier).write(message, msgLen);
+			auto str = oss.str();
+			std::cerr << "Sending file: " << str.substr(20) << '\n';
+			//sendBuf.replace(0, DataOffset::Length, reinterpret_cast<const char*>(size), DataOffset::Length);
+			//std::cerr << "Sending data: " << sendBuf << '\n';
+			EnterCriticalSection(&m_criticalSection);
+			for (auto& t : m_threads) {
+				if (send(t.m_socket, str.data(), str.length(), 0) == SOCKET_ERROR) {
+					std::cerr << "Send failed: " << WSAGetLastError() << '\n';
+					break;
+				}
+			}
+			LeaveCriticalSection(&m_criticalSection);
+			break;
+		}
 		default:
-			std::cerr << "Unknown type\n";
+			std::cerr << "Unknown type " << (int)type << '\n';
 			return;
 		}
 	}

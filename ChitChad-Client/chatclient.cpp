@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <QDebug>
 
 ChatClient::ChatClient(std::string_view name, const char *address)
 {
@@ -78,34 +79,42 @@ int ChatClient::sendUsername(std::string_view username)
     return send(ClientSocket, str.data(), str.size(), 0);
 }
 
-int ChatClient::sendMessage(std::string_view message/*, std::string_view username*/)
+int ChatClient::sendMessage(std::string_view message)
 {
     std::ostringstream oss;
-    uint32_t size = sizeof(uint32_t) + 1 + /*1 + username.length() +*/ message.length();
+    uint32_t size = sizeof(uint32_t) + 1 + message.length();
     oss.write(reinterpret_cast<const char*>(&size), sizeof(size));
     oss << static_cast<char>(DataProtocol::Message)
-//        << static_cast<char>(username.length())
-//        << username
         << message;
+    auto str = oss.str();
+    qDebug() << size << str.c_str();
+    return send(ClientSocket, str.data(), str.size(), 0);
+}
+
+int ChatClient::sendFile(std::string_view path)
+{
+    std::ifstream ifs(path.data(), std::ifstream::binary);
+    if (!ifs) {
+        qDebug() << "Error while opening file";
+        return -1;
+    }
+    std::ostringstream oss;
+    auto filename = getFilename(path);
+    oss << ifs.rdbuf();
+    auto content = oss.str();
+    oss.clear();
+    uint32_t size = sizeof(uint32_t) + 1 + 1 + filename.length() + content.length();
+    oss.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    oss << static_cast<char>(DataProtocol::File)
+        << static_cast<char>(filename.length())
+        << filename
+        << content;
     auto str = oss.str();
     return send(ClientSocket, str.data(), str.size(), 0);
 }
 
-int ChatClient::sendFile(std::string_view filename, std::string_view username)
+std::string_view ChatClient::getFilename(std::string_view path)
 {
-    std::ifstream ifs(filename.data(), std::ifstream::binary);
-    std::ostringstream oss;
-    oss << ifs.rdbuf();
-    auto fileContent = oss.str();
-    uint32_t size = sizeof(uint32_t) + 1 + 1 + username.length() + 1 + filename.length() + fileContent.length();
-    oss.clear();
-    oss.write(reinterpret_cast<const char*>(&size), sizeof(size));
-    oss << static_cast<char>(DataProtocol::File)
-        << static_cast<char>(username.length())
-        << username
-        << static_cast<char>(filename.length())
-        << filename
-        << fileContent;
-    auto str = oss.str();
-    return send(ClientSocket, str.data(), str.size(), 0);
+    auto pos = path.find_last_of('/');
+    return pos != path.npos ? path.substr(pos) : path;
 }

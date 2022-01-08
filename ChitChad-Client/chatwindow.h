@@ -2,6 +2,7 @@
 #define CHATWINDOW_H
 
 #include <QWidget>
+#include <string>
 #include "chatclient.h"
 #include "receiverthread.h"
 
@@ -17,10 +18,20 @@ public:
     ChatWindow(QWidget *parent = nullptr);
     ~ChatWindow();
 
+private slots:
+    void on_pushButton_clicked();
+
+    void on_sendButton_clicked();
+
 private:
+    std::string getHeader(std::string_view username);
+    void insertMessage(std::string_view username, std::string_view message);
+    void createFile(std::string_view username, std::string_view filename, std::string_view content);
+    void sendMessage();
+
     Ui::ChatWindow *ui;
     ChatClient *chatClient;
     ReceiverThread *thread;
-    QString name;
+    std::string name;
 };
 #endif // CHATWINDOW_H
