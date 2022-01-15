@@ -15,17 +15,19 @@ public slots:
     virtual void run() override;
 
 signals:
-    void getUserList(std::string_view users);
-    void getMessage(std::string_view username, std::string_view message);
-    void getFile(std::string_view username, std::string_view filename, std::string_view content);
+    void getUserList(std::string users, std::string channels);
+    void getMessage(std::string username, std::string message);
+    void getFile(std::string username, std::string filename, std::string content);
+    void getChannelMessage(std::string username, std::string channel, std::string message);
+    void getChannelFile(std::string username, std::string channel, std::string filename, std::string content);
 
 private:
     enum DataProtocol {
         UserList,   // <length><type><users>
         Message,    // <length><type><from_user><message>
         File,       // <length><type><from_user><file>
-        Success,    // <length><type><users>
-        Failure     // <length><type><users>
+        ChannelMessage,
+        ChannelFile
     };
 
     SOCKET m_socket;

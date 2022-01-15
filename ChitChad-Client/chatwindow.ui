@@ -7,28 +7,12 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>599</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>ChatWindow</string>
   </property>
-  <widget class="QPlainTextEdit" name="chatTextEdit">
-   <property name="geometry">
-    <rect>
-     <x>13</x>
-     <y>19</y>
-     <width>501</width>
-     <height>501</height>
-    </rect>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::NoFocus</enum>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPlainTextEdit" name="messageTextEdit">
    <property name="geometry">
     <rect>
@@ -52,20 +36,20 @@
     <string>Send</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="channelButton">
+  <widget class="QPushButton" name="newChannelButton">
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>530</x>
      <y>490</y>
      <width>80</width>
      <height>24</height>
     </rect>
    </property>
    <property name="text">
-    <string>New Channel</string>
+    <string>New</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="exitButton">
+  <widget class="QPushButton" name="deleteChannelButton">
    <property name="geometry">
     <rect>
      <x>700</x>
@@ -75,10 +59,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Disconnect</string>
+    <string>Delete</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="fileButton">
    <property name="geometry">
     <rect>
      <x>730</x>
@@ -91,12 +75,12 @@
     <string>File</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="refreshButton">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>490</y>
-     <width>80</width>
+     <x>529</x>
+     <y>250</y>
+     <width>251</width>
      <height>24</height>
     </rect>
    </property>
@@ -104,23 +88,59 @@
     <string>Refresh</string>
    </property>
   </widget>
-  <widget class="QListWidget" name="listWidget">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
-     <y>20</y>
-     <width>261</width>
-     <height>231</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QListWidget" name="channelListWidget">
    <property name="geometry">
     <rect>
-     <x>520</x>
-     <y>260</y>
-     <width>261</width>
+     <x>530</x>
+     <y>280</y>
+     <width>251</width>
+     <height>201</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="addButton">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>490</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>+</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="removeButton">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>490</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>-</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>21</y>
+     <width>251</width>
      <height>221</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="chatTextEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>501</width>
+     <height>491</height>
     </rect>
    </property>
   </widget>

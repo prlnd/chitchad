@@ -1,6 +1,10 @@
 #include "ChatServer.h"
 #include "ClientThread.h"
 #include <iostream>
+#include <string>
+#include <map>
+#include <set>
+#include <memory>
 
 ChatServer::ChatServer()
 {
@@ -57,7 +61,9 @@ void ChatServer::serve()
 	//---------------------- 
 	// Create a SOCKET for accepting incoming requests. 
 	SOCKET acceptSocket;
-	std::list<ClientThread> threads;
+	std::map<std::string, ClientThread> threads;
+	std::map<std::string, std::set<std::string>> channels;
+	channels.try_emplace("<All>", std::set<std::string>());
 	CRITICAL_SECTION criticalSection;
 	InitializeCriticalSection(&criticalSection);
 	for (;;) {
@@ -70,7 +76,20 @@ void ChatServer::serve()
 			return;
 		}
 		std::cerr << "Client connected.\n";
-		threads.emplace_back(acceptSocket, threads, criticalSection);
-		threads.back().start();
+		char recvBuf[MAX_ID_LEN];
+		int iResult = recv(acceptSocket, recvBuf, sizeof(recvBuf), 0);
+		if (iResult == SOCKET_ERROR) {
+			std::cerr << "Recv failed: " << WSAGetLastError() << '\n';
+			return;
+		}
+		std::string id(recvBuf, iResult);
+		std::cerr << "Received name: " << id << '\n';
+		auto [it, ok] = threads.try_emplace(id, acceptSocket, threads, channels, criticalSection, id);
+		if (ok) {
+			std::cerr << "Inserting is successful\n";
+			it->second.start();
+		} else {
+			std::cerr << "Insertion failed\n";
+		}
 	}
 }

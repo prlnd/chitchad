@@ -15,4 +15,5 @@ private:
 	SOCKET m_listenSocket;
 	static inline const char* ADDRESS = "127.0.0.1";
 	static inline const short PORT = 13000;
+	static inline const int MAX_ID_LEN = 32;
 };
